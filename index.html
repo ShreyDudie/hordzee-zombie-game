@@ -2,45 +2,46 @@
 <html>
   <head>
     <title>Instant AR Target Shooter</title>
-    <!-- Fully secured HTTPS tracking frameworks -->
+    <!-- Completely safe, absolute modern frameworks for tracking -->
     <script src="https://aframe.io"></script>
-    <script src="https://githack.com"></script>
+    <script src="https://jsdelivr.net"></script>
     <script>
-      // Detection component to handle shooting when objects are tapped
+      // Triggers damage logic when target objects are tapped on the mobile screen
       AFRAME.registerComponent('shoot-target', {
         init: function () {
           this.el.addEventListener('click', function () {
-            // Shrink target on hit
+            // Shrink down size on hit 
             this.setAttribute('animation__die', { property: 'scale', to: '0 0 0', dur: 150 });
-            // Erase from 3D room environment
-            setTimeout(() => { this.parentNode.removeChild(this); }, 150);
-          });
+            // Remove completely from screen tracking space
+            setTimeout(() => { this.el.parentNode.removeChild(this.el); }, 150);
+          }.bind(this));
         }
       });
     </script>
   </head>
   <body style="margin: 0; overflow: hidden;">
-    <!-- Activates the device webcam to display your room behind the targets -->
+    <!-- Pulls camera data dynamically to serve your room as the background frame -->
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
       
-      <!-- FIRST PERSON HUD: Glues gun and crosshair onto the phone viewport screen -->
+      <!-- FIRST PERSON HUD VIEW: Weapon placement remains static as your device tilts around -->
       <a-camera raycaster="objects: .enemy" cursor="fuse: false; rayOrigin: mouse;">
         
-          <a-box position="0 0.05 -0.2" scale="0.04 0.04 0.35" color="#1a1a1a"></a-box> <!-- Gun Barrel -->
-          <a-box position="0 -0.06 0" scale="0.05 0.12 0.05" color="#2b2b2b"></a-box> <!-- Grip / Hands -->
+          <a-box position="0 0.05 -0.2" scale="0.04 0.04 0.35" color="#1c1c1c"></a-box> <!-- Gun Barrel -->
+          <a-box position="0 -0.06 0" scale="0.05 0.12 0.05" color="#3d3d3d"></a-box> <!-- Handle Grip -->
         
-        <a-ring radius-inner="0.01" radius-outer="0.018" position="0 0 -0.8" color="red" material="shader: flat"></a-ring>
+        <!-- Custom neon sight indicator -->
+        <a-ring radius-inner="0.01" radius-outer="0.016" position="0 0 -0.8" color="#00ffff" material="shader: flat"></a-ring>
       </a-camera>
 
-      <!-- ENEMY TARGETS: Spawns targets in mid-air floating toward your coordinates -->
+      <!-- ENEMY SPATIAL SPAWNS: Spawns floats right in front of you, heading inward -->
       
-        <a-box color="#3b5936" scale="0.5 1.5 0.4"></a-box> <!-- Zombie Proxy Shape -->
-        <a-sphere color="#ff0000" radius="0.07" position="0 0.6 0.2"></a-sphere>
+        <a-box color="#3e633d" scale="0.5 1.5 0.4"></a-box> <!-- Floating Enemy Proxy Object -->
+        <a-sphere color="#ff2a2a" radius="0.07" position="0 0.6 0.2"></a-sphere>
       
 
       
-        <a-box color="#3b5936" scale="0.5 1.5 0.4"></a-box>
-        <a-sphere color="#ff0000" radius="0.07" position="0 0.6 0.2"></a-sphere>
+        <a-box color="#3e633d" scale="0.5 1.5 0.4"></a-box>
+        <a-sphere color="#ff2a2a" radius="0.07" position="0 0.6 0.2"></a-sphere>
       
 
     </a-scene>
