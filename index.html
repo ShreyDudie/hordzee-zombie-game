@@ -1,48 +1,56 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Instant AR Target Shooter</title>
-    <!-- Completely safe, absolute modern frameworks for tracking -->
+    <title>AR Hand Tracking Sandbox</title>
+    <!-- Include A-Frame and high-precision browser tracking engines -->
     <script src="https://aframe.io"></script>
     <script src="https://jsdelivr.net"></script>
     <script>
-      // Triggers damage logic when target objects are tapped on the mobile screen
-      AFRAME.registerComponent('shoot-target', {
+      // Interaction system to simulate holding and grabbing objects
+      AFRAME.registerComponent('hand-grab', {
         init: function () {
-          this.el.addEventListener('click', function () {
-            // Shrink down size on hit 
-            this.setAttribute('animation__die', { property: 'scale', to: '0 0 0', dur: 150 });
-            // Remove completely from screen tracking space
-            setTimeout(() => { this.el.parentNode.removeChild(this.el); }, 150);
-          }.bind(this));
+          this.isHolding = false;
+          
+          // Detect when user touches/holds down on a floating object
+          this.el.addEventListener('mousedown', (evt) => {
+            if (!this.isHolding) {
+              this.isHolding = true;
+              this.el.setAttribute('color', '#ffaa00'); // Change color to show it is selected
+              
+              // Anchor the 3D block dynamically to the front of the mobile camera view
+              let camera = document.querySelector('[camera]');
+              this.el.setAttribute('position', '0 -0.2 -1.5');
+              camera.appendChild(this.el); 
+            } else {
+              // Tap it a second time to release and drop it back into the physical room space
+              this.isHolding = false;
+              this.el.setAttribute('color', '#4CC3D9');
+              
+              // Release object back down into global coordinates
+              let scene = document.querySelector('a-scene');
+              let camPos = new THREE.Vector3();
+              camera.object3D.getWorldPosition(camPos);
+              this.el.setAttribute('position', `${camPos.x} ${camPos.y - 0.4} ${camPos.z - 2}`);
+              scene.appendChild(this.el);
+            }
+          });
         }
       });
     </script>
   </head>
   <body style="margin: 0; overflow: hidden;">
-    <!-- Pulls camera data dynamically to serve your room as the background frame -->
+    <!-- Pulls mobile webcam feed and maps high-performance orientation metrics -->
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
       
-      <!-- FIRST PERSON HUD VIEW: Weapon placement remains static as your device tilts around -->
-      <a-camera raycaster="objects: .enemy" cursor="fuse: false; rayOrigin: mouse;">
-        
-          <a-box position="0 0.05 -0.2" scale="0.04 0.04 0.35" color="#1c1c1c"></a-box> <!-- Gun Barrel -->
-          <a-box position="0 -0.06 0" scale="0.05 0.12 0.05" color="#3d3d3d"></a-box> <!-- Handle Grip -->
-        
-        <!-- Custom neon sight indicator -->
-        <a-ring radius-inner="0.01" radius-outer="0.016" position="0 0 -0.8" color="#00ffff" material="shader: flat"></a-ring>
+      <!-- INTERACTIVE VIEWPANEL: Maps your screen focus for interaction mechanics -->
+      <a-camera cursor="fuse: false; rayOrigin: mouse;">
+        <a-ring radius-inner="0.015" radius-outer="0.025" position="0 0 -1" color="#ff00ff" material="shader: flat"></a-ring>
       </a-camera>
 
-      <!-- ENEMY SPATIAL SPAWNS: Spawns floats right in front of you, heading inward -->
-      
-        <a-box color="#3e633d" scale="0.5 1.5 0.4"></a-box> <!-- Floating Enemy Proxy Object -->
-        <a-sphere color="#ff2a2a" radius="0.07" position="0 0.6 0.2"></a-sphere>
-      
-
-      
-        <a-box color="#3e633d" scale="0.5 1.5 0.4"></a-box>
-        <a-sphere color="#ff2a2a" radius="0.07" position="0 0.6 0.2"></a-sphere>
-      
+      <!-- PHYSICS OBJECTS: Virtual 3D blocks floating in the air that you can grab and move -->
+      <a-box class="interactive" hand-grab position="-0.5 0 -2" rotation="0 45 0" color="#4CC3D9" scale="0.4 0.4 0.4"></a-box>
+      <a-sphere class="interactive" hand-grab position="0.5 0.5 -2.5" radius="0.25" color="#EF2D5E"></a-sphere>
+      <a-cylinder class="interactive" hand-grab position="0 -0.5 -3" radius="0.2" height="0.6" color="#FFC65D"></a-cylinder>
 
     </a-scene>
   </body>
